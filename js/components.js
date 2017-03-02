@@ -21466,7 +21466,11 @@ return jQuery;
     }
 
     function debugLog(str) {
-        if (typeof window !== "undefined" && typeof window.console !== "undefined" && typeof window.console.log !== "undefined") {
+        // prevent logging persistence messages to persistence layer
+        if (typeof window.console._log != "undefined") {
+            window.console._log(str);
+        }
+        else if (typeof window !== "undefined" && typeof window.console !== "undefined" && typeof window.console.log !== "undefined") {
             window.console.log(str);
         }
         else if(console.log !== "undefined") {
