@@ -57,12 +57,15 @@
         },
 
         fetch: function() {
-            return new Promise(function(resolve) {
-                items.fetch({reset: true}).fail(function() {
-                    console.log('Failed to fetch from storage');
-                }).always(resolve);
+            return new Promise(function(resolve, reject) {
+                items.fetch({reset: true})
+                .then(resolve)
+                .fail(function(e) {
+                    reject(e);
+                });
             });
-        }
+        },
+        items: items
     };
     window.textsecure = window.textsecure || {};
     window.textsecure.storage = window.textsecure.storage || {};

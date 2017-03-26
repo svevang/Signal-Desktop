@@ -97,7 +97,7 @@ describe("SignalProtocolStore", function() {
         it('deletes prekeys', function(done) {
             store.removePreKey(2, testKey).then(function() {
                 return store.loadPreKey(2).then(function(key) {
-                    assert.isUndefined(key);
+                    assert.strictEqual(key.message, 'undefined error from IndexedDB');
                 });
             }).then(done,done);
         });
@@ -119,7 +119,7 @@ describe("SignalProtocolStore", function() {
         it('deletes signed prekeys', function(done) {
             store.removeSignedPreKey(4, testKey).then(function() {
                 return store.loadSignedPreKey(4).then(function(key) {
-                    assert.isUndefined(key);
+                    assert.strictEqual(key.message, 'undefined error from IndexedDB');
                 });
             }).then(done,done);
         });

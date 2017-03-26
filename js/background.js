@@ -65,7 +65,9 @@
     };
 
 
-    storage.fetch();
+    storage.fetch().catch(function(e) {
+        console.log('Failed to fetch from storage:', e.message);
+    });
     storage.onready(function() {
         window.dispatchEvent(new Event('storage_ready'));
         setUnreadCount(storage.get("unreadCount", 0));

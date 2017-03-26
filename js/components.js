@@ -21436,14 +21436,14 @@ return jQuery;
             // Failed to open the database
             this.error = "Couldn't not connect to the database"
             if (!this.nolog) debugLog("Couldn't not connect to the database");
-            this.onerror();
+            this.onerror(e);
         }.bind(this);
 
         this.dbRequest.onabort = function (e) {
             // Failed to open the database
             this.error = "Connection to the database aborted"
             if (!this.nolog) debugLog("Connection to the database aborted");
-            this.onerror();
+            this.onerror(e);
         }.bind(this);
 
 
@@ -21908,17 +21908,18 @@ return jQuery;
             this.next();
         },
 
-        error: function() {
+        error: function(event) {
+            var errorEvent = event;
             this.failed = true;
             _.each(this.stack, function (message) {
-                this.execute(message);
+                this.execute(message, errorEvent);
             }.bind(this));
             this.stack = [];
             this.next();
         },
 
         // Executes a given command on the driver. If not started, just stacks up one more element.
-        execute: function (message) {
+        execute: function (message, errorEvent) {
             if (this.started) {
               try {
                 this.driver.execute(message[2].storeName || message[1].storeName, message[0], message[1], message[2]); // Upon messages, we execute the query
@@ -21930,7 +21931,7 @@ return jQuery;
                 throw e;
               }
             } else if (this.failed) {
-                message[2].error();
+                message[2].error(errorEvent);
             } else {
                 this.stack.push(message);
             }
@@ -21995,9 +21996,17 @@ return jQuery;
 
         var error = options.error;
         options.error = function(resp) {
-            if (error) error(resp);
-            reject();
-            object.trigger('error', object, resp, options);
+            var respError;
+            if(typeof resp == 'undefined' || typeof resp.target == 'undefined') {
+                respError = new Error('undefined error from IndexedDB');
+            }
+            else{
+                respError = resp.target.error;
+            }
+
+            if (error) error(respError);
+            reject(respError);
+            object.trigger('error', object, respError, options);
         };
 
         var next = function(){
